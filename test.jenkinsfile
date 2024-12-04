@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage ('cleanup'){
             steps{
-                // TODO
+                sh 'rm -rf ./*'
             }
         }
         stage('fetch app code') {
