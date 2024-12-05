@@ -32,7 +32,7 @@ pipeline {
         stage('Push artifact') {
             steps {
                 sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
-                sh 'docker push kaiverleysen/calculator'
+                sh 'docker push kaiverleysenpxl/calculator'
             }
         }
         stage('deployment') {
