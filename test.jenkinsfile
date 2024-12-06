@@ -12,6 +12,7 @@ pipeline {
                 sh 'rm -rf ./*'
                 sh 'docker ps -q | xargs -r docker stop'
                 sh 'docker ps -aq | xargs -r docker rm'
+                sh 'docker image ls -q | xargs -r docker image rm'
             }
         }
         stage('fetch app code') {
