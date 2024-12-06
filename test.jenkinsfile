@@ -1,17 +1,51 @@
 pipeline {
     agent any
-  
+    tools {
+        nodejs 'testenvnode'
+    }
+    environment {
+        DOCKERHUB_CREDENTIALS = credentials 'dockerhub'
+    }
     stages {
         stage ('cleanup'){
             steps{
-                // TODO
+                sh 'rm -rf ./*'
+                sh 'docker ps -q | xargs -r docker stop'
+                sh 'docker ps -aq | xargs -r docker rm'
+                sh 'docker image ls -q | xargs -r docker image rm'
             }
         }
         stage('fetch app code') {
             steps {
-                // Get some code from a GitHub repository
                 git branch: 'main', url: 'https://github.com/PXL-2TIN-DevOps-Resources/calculator-app-finished.git'
             }
+        }
+        stage('Install dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+        stage('Build artifact') {
+            steps {
+                sh 'docker build -t kaiverleysenpxl/calculator .'
+            }
+        }
+        stage('Push artifact') {
+            steps {
+                sh 'echo $DOCKERHUB_CREDENTIALS_PSW | docker login -u $DOCKERHUB_CREDENTIALS_USR --password-stdin'
+                sh 'docker push kaiverleysenpxl/calculator'
+            }
+        }
+        stage('deployment') {
+            steps {
+                sh 'docker pull kaiverleysenpxl/calculator:latest'
+                sh 'docker run -d --name calculator -p 3000:3000 kaiverleysenpxl/calculator'
+            }
+        }
+    }
+    post {
+        always {
+            sh 'docker logout'
         }
     }
 }
