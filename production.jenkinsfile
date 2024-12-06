@@ -1,9 +1,29 @@
 pipeline {
     agent any
+    environment {
+        EC2_IP = '18.212.66.227'
+    }
     stages {
-        stage('dtap production') {
+        stage('cleanup') {
             steps {
-                echo "good luck..."
+                sshagent(['ec2_key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no -tt ubuntu@${EC2_IP} \\
+                        'docker ps -q | xargs -r docker stop; \\
+                         docker ps -aq | xargs -r docker rm; \\
+                         docker image ls -q | xargs -r docker image rm'
+                    """
+                }
+            }
+        }
+        stage('deploy prod') {
+            steps {
+                sshagent(['ec2_key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no -tt ubuntu@${EC2_IP} \\
+                        'docker pull kaiverleysenpxl/calculator:latest'
+                    """
+                }
             }
         }
     }

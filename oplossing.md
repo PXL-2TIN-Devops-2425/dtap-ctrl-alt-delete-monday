@@ -24,3 +24,8 @@ Na het uitvoeren van de test.jenkinsfile zien we dat de docker container opgesta
 
 
 b)
+
+Om jenkins rechten te geven tot onze ec2 instance hebben we de ssh key van de ubuntu server toegevoegd aan onze jenkins credentials:
+
+ SSH key:
+![alt text](images/ssh_credentials.png)
