@@ -26,5 +26,25 @@ pipeline {
                 }
             }
         }
+        stage('start prod') {
+            steps {
+                sshagent(['ec2_key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no -tt ubuntu@${EC2_IP} \
+                        'docker run -d --name calculator -p 80:3000 kaiverleysenpxl/calculator'
+                    """
+                }
+            }
+        }
+        stage('test prod') {
+            steps {
+                sshagent(['ec2_key']) {
+                    sh """
+                    ssh -o StrictHostKeyChecking=no -tt ubuntu@${EC2_IP} \
+                        'curl -I http://localhost/'
+                    """
+                }
+            }
+        }
     }
 }
